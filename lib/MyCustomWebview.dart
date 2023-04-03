@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:YugoAuto/services/device/DeviceService.dart';
+import 'package:YugoAuto/services/notifications/PushService.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:loader_overlay/loader_overlay.dart';
@@ -23,7 +23,7 @@ class _MyCustomWebViewState extends State<MyCustomWebView> {
   late StreamSubscription<ConnectivityResult> _subscription;
   late final WebViewController _webViewController;
 
-  final DeviceService _deviceService = DeviceService();
+  final PushService _pushService = PushService();
 
   @override
   initState() {
@@ -41,24 +41,18 @@ class _MyCustomWebViewState extends State<MyCustomWebView> {
   @override
   Widget build(BuildContext context) {
     if (_isConnected) {
-      (_showLoader == true)
-          ? context.loaderOverlay.show()
-          : context.loaderOverlay.hide();
+      (_showLoader == true) ? context.loaderOverlay.show() : context.loaderOverlay.hide();
       return SafeArea(
         child: WebViewWidget(controller: _webViewController),
       );
     }
 
     return Container(
-        alignment: Alignment.center,
-        color: Colors.white,
-        child: Image.asset('assets/images/no_internet.png'));
+        alignment: Alignment.center, color: Colors.white, child: Image.asset('assets/images/no_internet.png'));
   }
 
   void _checkConnectivity() {
-    _subscription = Connectivity()
-        .onConnectivityChanged
-        .listen((ConnectivityResult result) {
+    _subscription = Connectivity().onConnectivityChanged.listen((ConnectivityResult result) {
       if (result == ConnectivityResult.none) {
         setState(() => _isConnected = false);
       } else {
@@ -81,18 +75,14 @@ class _MyCustomWebViewState extends State<MyCustomWebView> {
           },
           onPageStarted: (String url) {},
           onPageFinished: (String url) async {
-            String deviceId = await _deviceService.getDeviceId();
-            String platform = _deviceService.getPlatform();
-            _webViewController.runJavaScript('savePushToken("token","' +
-                deviceId +
-                '", "' +
-                platform +
-                '");');
+            String? command = await _pushService.getPushTokenJavascriptCommand();
+            if (command != null) {
+              _webViewController.runJavaScript(command);
+            }
           },
           onWebResourceError: (WebResourceError error) {},
           onNavigationRequest: (NavigationRequest request) {
-            if (!request.url.startsWith(_mainUrl) &&
-                !request.url.startsWith(_mainUrlWithWww)) {
+            if (!request.url.startsWith(_mainUrl) && !request.url.startsWith(_mainUrlWithWww)) {
               return NavigationDecision.prevent;
             }
             return NavigationDecision.navigate;

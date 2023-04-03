@@ -1,14 +1,14 @@
 import 'dart:io';
 
+import 'package:YugoAuto/services/notifications/FirebaseOptions.dart';
+import 'package:YugoAuto/services/notifications/PushService.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:my_app_namespace/core/helpers/device_info_helper.dart';
-import 'package:my_app_namespace/core/http/http_helper.dart';
-import 'package:my_app_namespace/core/notifications/firebase_options.dart';
-import 'package:my_app_namespace/core/storage/storage_helper.dart';
-import 'package:my_app_namespace/core/user/helpers/user_helper.dart';
+import 'package:get_storage/get_storage.dart';
 
-class FirebaseHelper {
+class FirebaseService {
+  final GetStorage _storage = GetStorage();
+
   Future<void> initFirebase() async {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
@@ -18,14 +18,14 @@ class FirebaseHelper {
     }
 
     if (Platform.isAndroid) {
-      sendPushToken();
+      _savePushToken();
       _listenToTokenChange();
     }
   }
 
   void _listenToTokenChange() {
     FirebaseMessaging.instance.onTokenRefresh.listen((fcmToken) {
-      sendPushToken();
+      _savePushToken();
       // Note: This callback is fired at each app startup and whenever a new
       // token is generated.
     }).onError((err) {
@@ -49,32 +49,17 @@ class FirebaseHelper {
     );
 
     if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-      sendPushToken();
+      _savePushToken();
       _listenToTokenChange();
     }
   }
 
-  void sendPushToken() async {
-    StorageHelper storage = StorageHelper();
-    UserHelper user = UserHelper();
-    HttpHelper http = HttpHelper();
-
+  void _savePushToken() async {
     final fcmToken = await FirebaseMessaging.instance.getToken();
-    String deviceId = await DeviceInfoHelper().getDeviceId();
-    String platform = Platform.isIOS ? 'ios' : 'android';
 
     if (fcmToken == null) {
       return;
     }
-
-    //only authenticated user can save push token
-    //save in storage to send to server later
-    if (!user.isAuthenticated()) {
-      storage.setPushToken(fcmToken);
-      return;
-    }
-
-    Map data = {'deviceId': deviceId, 'platform': platform, 'token': fcmToken};
-    http.makeRequest(endpoint: '/push-token', method: 'POST', data: data);
+    _storage.write(PushService.TOKEN_KEY, fcmToken);
   }
 }
