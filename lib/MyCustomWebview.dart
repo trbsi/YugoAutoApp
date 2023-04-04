@@ -69,12 +69,12 @@ class _MyCustomWebViewState extends State<MyCustomWebView> {
           onProgress: (int progress) {
             if (progress < 100) {
               setState(() => _showLoader = true);
-            } else {
-              setState(() => _showLoader = false);
             }
           },
           onPageStarted: (String url) {},
           onPageFinished: (String url) async {
+            setState(() => _showLoader = false);
+
             //implement this function on web app
             Object isUserAuthenticated = await _webViewController.runJavaScriptReturningResult('isUserAuthenticated()');
 
