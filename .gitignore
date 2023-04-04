@@ -48,4 +48,6 @@ android/app/google-services.json
 ios/Runner/GoogleService-Info.plist
 ios/firebase_app_id_file.json
 lib/services/notifications/FirebaseOptions.dart
-
+production_com.yugoauto.app_ios.p12
+production_com.yugoauto.app_ios.pem
+production_com.yugoauto.app_ios.pkey

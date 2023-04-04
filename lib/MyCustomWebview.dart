@@ -42,9 +42,11 @@ class _MyCustomWebViewState extends State<MyCustomWebView> {
   Widget build(BuildContext context) {
     if (_isConnected) {
       (_showLoader == true) ? context.loaderOverlay.show() : context.loaderOverlay.hide();
-      return SafeArea(
-        child: WebViewWidget(controller: _webViewController),
-      );
+      return Container(
+          color: Colors.white,
+          child: SafeArea(
+            child: WebViewWidget(controller: _webViewController),
+          ));
     }
 
     return Container(
@@ -66,12 +68,10 @@ class _MyCustomWebViewState extends State<MyCustomWebView> {
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setNavigationDelegate(
         NavigationDelegate(
-          onProgress: (int progress) {
-            if (progress < 100) {
-              setState(() => _showLoader = true);
-            }
+          onProgress: (int progress) {},
+          onPageStarted: (String url) {
+            setState(() => _showLoader = true);
           },
-          onPageStarted: (String url) {},
           onPageFinished: (String url) async {
             setState(() => _showLoader = false);
 
