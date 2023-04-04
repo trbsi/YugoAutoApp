@@ -75,9 +75,14 @@ class _MyCustomWebViewState extends State<MyCustomWebView> {
           },
           onPageStarted: (String url) {},
           onPageFinished: (String url) async {
-            String? command = await _pushService.getPushTokenJavascriptCommand();
-            if (command != null) {
-              _webViewController.runJavaScript(command);
+            //implement this function on web app
+            Object isUserAuthenticated = await _webViewController.runJavaScriptReturningResult('isUserAuthenticated()');
+
+            if (isUserAuthenticated.toString() == 'true') {
+              String? command = await _pushService.getPushTokenJavascriptCommand();
+              if (command != null) {
+                _webViewController.runJavaScript(command);
+              }
             }
           },
           onWebResourceError: (WebResourceError error) {},
