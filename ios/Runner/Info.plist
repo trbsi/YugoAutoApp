@@ -51,8 +51,8 @@
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
 	<key>NSPhotoLibraryUsageDescription</key>
-    <string>Allow to access photo library.</string>
+    <string>Allow to access photo library in order to upload a profile picture.</string>
     <key>NSCameraUsageDescription</key>
-    <string>Allow to access camera.</string>
+    <string>Allow to access camera in order to take a profile picture.</string>
 </dict>
 </plist>
