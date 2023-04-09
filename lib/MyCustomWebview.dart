@@ -46,9 +46,9 @@ class _MyCustomWebViewState extends State<MyCustomWebView> {
           color: Colors.white,
           child: SafeArea(
               child: Scaffold(
-            resizeToAvoidBottomInset: true,
-            body: WebViewWidget(controller: _webViewController),
-          )));
+                resizeToAvoidBottomInset: true,
+                body: WebViewWidget(controller: _webViewController),
+              )));
     }
 
     return Container(
@@ -78,34 +78,38 @@ class _MyCustomWebViewState extends State<MyCustomWebView> {
       onPageStarted: (String url) {
         setState(() => _showLoader = true);
       },
-      onPageFinished: (String url) async {
-        setState(() => _showLoader = false);
-
-        //implement this function on web app
-        Object isUserAuthenticated = await _webViewController.runJavaScriptReturningResult('isUserAuthenticated()');
-
-        if (isUserAuthenticated.toString() == 'true') {
-          String? command = await _pushService.getPushTokenJavascriptCommand();
-          if (command != null) {
-            _webViewController.runJavaScript(command);
-          }
-        }
-      },
+      onPageFinished: _onPageFinished,
       onWebResourceError: (WebResourceError error) {},
-      onNavigationRequest: (NavigationRequest request) {
-        if (request.url.startsWith(UrlService.mainUrlWithRedirect()) ||
-            request.url.startsWith(UrlService.mainUrlWithRedirect(withWww: true))) {
-          _webviewCoreService.launchURL(request.url);
-          return NavigationDecision.prevent;
-        }
-
-        if (request.url.startsWith(UrlService.mainUrl()) || request.url.startsWith(UrlService.mainUrl(withWww: true))) {
-          return NavigationDecision.navigate;
-        }
-
-        _webviewCoreService.launchURL(request.url);
-        return NavigationDecision.prevent;
-      },
+      onNavigationRequest: _onNavigationRequest,
     );
+  }
+
+  void _onPageFinished(String url) async {
+    setState(() => _showLoader = false);
+
+    //implement this function on web app
+    Object isUserAuthenticated = await _webViewController.runJavaScriptReturningResult('isUserAuthenticated()');
+
+    if (isUserAuthenticated.toString() == 'true') {
+      String? command = await _pushService.getPushTokenJavascriptCommand();
+      if (command != null) {
+        _webViewController.runJavaScript(command);
+      }
+    }
+  }
+
+  FutureOr<NavigationDecision> _onNavigationRequest(NavigationRequest request) {
+    if (request.url.startsWith(UrlService.mainUrlWithRedirect()) ||
+        request.url.startsWith(UrlService.mainUrlWithRedirect(withWww: true))) {
+      _webviewCoreService.launchURL(request.url);
+      return NavigationDecision.prevent;
+    }
+
+    if (request.url.startsWith(UrlService.mainUrl()) || request.url.startsWith(UrlService.mainUrl(withWww: true))) {
+      return NavigationDecision.navigate;
+    }
+
+    _webviewCoreService.launchURL(request.url);
+    return NavigationDecision.prevent;
   }
 }

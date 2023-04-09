@@ -12,13 +12,17 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - Non yugoauto.com links should be open in a browser. Solution found
   here https://stackoverflow.com/questions/65292270/flutter-webview-opening-external-links-in-browser-or-window
-- Move URL generator to its own service
+
+### Changed
+
+- Move URL generator to its own service (UrlService)
+- Replace webview callbacks with private functions in MyCustomWebview
 
 ## [1.0.2] - 2023-04-09
 
 ### Fixed
 
-- Fix soft keyboard covering text input on display. Whenever softkeyboard was
+- Fix soft keyboard covering text input on display. Whenever soft keyboard was
   displayed it covered text input and it could not be scrolled. Resolved
   via https://stackoverflow.com/questions/67286328/flutter-webview-text-input-gets-hidden-by-soft-keyboard
 
