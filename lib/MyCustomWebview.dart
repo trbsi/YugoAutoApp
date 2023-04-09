@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:YugoAuto/services/notifications/PushService.dart';
+import 'package:YugoAuto/services/webview/WebviewCoreService.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:loader_overlay/loader_overlay.dart';
@@ -24,6 +25,7 @@ class _MyCustomWebViewState extends State<MyCustomWebView> {
   late final WebViewController _webViewController;
 
   final PushService _pushService = PushService();
+  final WebviewCoreService _webviewCoreService = WebviewCoreService();
 
   @override
   initState() {
@@ -68,34 +70,37 @@ class _MyCustomWebViewState extends State<MyCustomWebView> {
   void _setWebView() {
     _webViewController = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setNavigationDelegate(
-        NavigationDelegate(
-          onProgress: (int progress) {},
-          onPageStarted: (String url) {
-            setState(() => _showLoader = true);
-          },
-          onPageFinished: (String url) async {
-            setState(() => _showLoader = false);
-
-            //implement this function on web app
-            Object isUserAuthenticated = await _webViewController.runJavaScriptReturningResult('isUserAuthenticated()');
-
-            if (isUserAuthenticated.toString() == 'true') {
-              String? command = await _pushService.getPushTokenJavascriptCommand();
-              if (command != null) {
-                _webViewController.runJavaScript(command);
-              }
-            }
-          },
-          onWebResourceError: (WebResourceError error) {},
-          onNavigationRequest: (NavigationRequest request) {
-            if (!request.url.startsWith(_mainUrl) && !request.url.startsWith(_mainUrlWithWww)) {
-              return NavigationDecision.prevent;
-            }
-            return NavigationDecision.navigate;
-          },
-        ),
-      )
+      ..setNavigationDelegate(_navigationDelegate())
       ..loadRequest(Uri.parse(_mainUrl));
+  }
+
+  NavigationDelegate _navigationDelegate() {
+    return NavigationDelegate(
+      onProgress: (int progress) {},
+      onPageStarted: (String url) {
+        setState(() => _showLoader = true);
+      },
+      onPageFinished: (String url) async {
+        setState(() => _showLoader = false);
+
+        //implement this function on web app
+        Object isUserAuthenticated = await _webViewController.runJavaScriptReturningResult('isUserAuthenticated()');
+
+        if (isUserAuthenticated.toString() == 'true') {
+          String? command = await _pushService.getPushTokenJavascriptCommand();
+          if (command != null) {
+            _webViewController.runJavaScript(command);
+          }
+        }
+      },
+      onWebResourceError: (WebResourceError error) {},
+      onNavigationRequest: (NavigationRequest request) {
+        if (request.url.startsWith(_mainUrl) || request.url.startsWith(_mainUrlWithWww)) {
+          return NavigationDecision.navigate;
+        }
+        _webviewCoreService.launchURL(request.url);
+        return NavigationDecision.prevent;
+      },
+    );
   }
 }
