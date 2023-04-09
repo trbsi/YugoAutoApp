@@ -12,6 +12,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - Non yugoauto.com links should be open in a browser. Solution found
   here https://stackoverflow.com/questions/65292270/flutter-webview-opening-external-links-in-browser-or-window
+- Move URL generator to its own service
 
 ## [1.0.2] - 2023-04-09
 

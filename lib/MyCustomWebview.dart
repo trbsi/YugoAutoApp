@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:YugoAuto/services/core/UrlService.dart';
 import 'package:YugoAuto/services/notifications/PushService.dart';
 import 'package:YugoAuto/services/webview/WebviewCoreService.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
@@ -17,9 +18,6 @@ class MyCustomWebView extends StatefulWidget {
 class _MyCustomWebViewState extends State<MyCustomWebView> {
   bool _isConnected = true;
   bool _showLoader = false;
-
-  final String _mainUrl = 'https://yugoauto.com';
-  final String _mainUrlWithWww = 'https://www.yugoauto.com';
 
   late StreamSubscription<ConnectivityResult> _subscription;
   late final WebViewController _webViewController;
@@ -71,7 +69,7 @@ class _MyCustomWebViewState extends State<MyCustomWebView> {
     _webViewController = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setNavigationDelegate(_navigationDelegate())
-      ..loadRequest(Uri.parse(_mainUrl));
+      ..loadRequest(Uri.parse(UrlService.mainUrl()));
   }
 
   NavigationDelegate _navigationDelegate() {
@@ -95,9 +93,16 @@ class _MyCustomWebViewState extends State<MyCustomWebView> {
       },
       onWebResourceError: (WebResourceError error) {},
       onNavigationRequest: (NavigationRequest request) {
-        if (request.url.startsWith(_mainUrl) || request.url.startsWith(_mainUrlWithWww)) {
+        if (request.url.startsWith(UrlService.mainUrlWithRedirect()) ||
+            request.url.startsWith(UrlService.mainUrlWithRedirect(withWww: true))) {
+          _webviewCoreService.launchURL(request.url);
+          return NavigationDecision.prevent;
+        }
+
+        if (request.url.startsWith(UrlService.mainUrl()) || request.url.startsWith(UrlService.mainUrl(withWww: true))) {
           return NavigationDecision.navigate;
         }
+
         _webviewCoreService.launchURL(request.url);
         return NavigationDecision.prevent;
       },
