@@ -46,9 +46,9 @@ class _MyCustomWebViewState extends State<MyCustomWebView> {
           color: Colors.white,
           child: SafeArea(
               child: Scaffold(
-                resizeToAvoidBottomInset: true,
-                body: WebViewWidget(controller: _webViewController),
-              )));
+            resizeToAvoidBottomInset: true,
+            body: WebViewWidget(controller: _webViewController),
+          )));
     }
 
     return Container(
