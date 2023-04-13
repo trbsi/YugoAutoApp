@@ -18,14 +18,23 @@ class FirebaseService {
     }
 
     if (Platform.isAndroid) {
-      _savePushToken();
+      savePushToken();
       _listenToTokenChange();
     }
   }
 
+  void savePushToken() async {
+    final fcmToken = await FirebaseMessaging.instance.getToken();
+
+    if (fcmToken == null) {
+      return;
+    }
+    _storage.write(PushService.TOKEN_KEY, fcmToken);
+  }
+
   void _listenToTokenChange() {
     FirebaseMessaging.instance.onTokenRefresh.listen((fcmToken) {
-      _savePushToken();
+      savePushToken();
       // Note: This callback is fired at each app startup and whenever a new
       // token is generated.
     }).onError((err) {
@@ -49,17 +58,8 @@ class FirebaseService {
     );
 
     if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-      _savePushToken();
+      savePushToken();
       _listenToTokenChange();
     }
-  }
-
-  void _savePushToken() async {
-    final fcmToken = await FirebaseMessaging.instance.getToken();
-
-    if (fcmToken == null) {
-      return;
-    }
-    _storage.write(PushService.TOKEN_KEY, fcmToken);
   }
 }
