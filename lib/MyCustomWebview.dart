@@ -1,12 +1,16 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:YugoAuto/services/core/UrlService.dart';
+import 'package:YugoAuto/services/filepicker/FilePickerService.dart';
 import 'package:YugoAuto/services/notifications/PushService.dart';
 import 'package:YugoAuto/services/webview/WebviewCoreService.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+//Android hack
+import 'package:webview_flutter_android/webview_flutter_android.dart' as webview_flutter_android;
 
 class MyCustomWebView extends StatefulWidget {
   const MyCustomWebView({Key? key}) : super(key: key);
@@ -24,6 +28,7 @@ class _MyCustomWebViewState extends State<MyCustomWebView> {
 
   final PushService _pushService = PushService();
   final WebviewCoreService _webviewCoreService = WebviewCoreService();
+  final FilePickerService _filePickerService = FilePickerService();
 
   @override
   initState() {
@@ -65,11 +70,17 @@ class _MyCustomWebViewState extends State<MyCustomWebView> {
     });
   }
 
-  void _setWebView() {
+  void _setWebView() async {
     _webViewController = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setNavigationDelegate(_navigationDelegate())
       ..loadRequest(Uri.parse(UrlService.mainUrl()));
+
+    //Android hack
+    if (Platform.isAndroid) {
+      final controller = (_webViewController.platform as webview_flutter_android.AndroidWebViewController);
+      await controller.setOnShowFileSelector(_filePickerService.androidFilePicker);
+    }
   }
 
   NavigationDelegate _navigationDelegate() {
