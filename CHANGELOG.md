@@ -6,14 +6,27 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2023-04-18
+
+### Fixed
+
+#### Android & iPhone
+
+- Phone verification is added and more URLs needs to be whitelisted so Firebase
+  SDK can be used in webview
+
+#### Android
+
 ## [1.1.0] - 2023-04-17
 
 ### Fixed
 
 #### Android
 
-- File upload on Android via webview doesn't work. Flutter team has to fix webview on their end.
-  Until then I used this small hack on Flutter side to able to upload photo from Android webview.
+- File upload on Android via webview doesn't work. Flutter team has to fix
+  webview on their end.
+  Until then I used this small hack on Flutter side to able to upload photo from
+  Android webview.
     - Also I had to do the change on web side on 1.16.1 version
     - Thanks to https://github.com/flutter/flutter/issues/118836
 
@@ -21,14 +34,16 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
-- If 24 hour passes resend push token to the server, just in case something happens we will resend
+- If 24 hour passes resend push token to the server, just in case something
+  happens we will resend
   token every 24 hours, thus ensure that token will be saved on server
 
 ## [1.0.4] - 2023-04-10
 
 ### Fixed
 
-- Fix problem with opening external URLs in browser in Android. This is fix on top of 1.0.3. Now it
+- Fix problem with opening external URLs in browser in Android. This is fix on
+  top of 1.0.3. Now it
   opens pages in real browser such as Safari or Chrome
 
 ## [1.0.3] - 2023-04-09

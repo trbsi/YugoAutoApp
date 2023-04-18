@@ -116,7 +116,7 @@ class _MyCustomWebViewState extends State<MyCustomWebView> {
       return NavigationDecision.prevent;
     }
 
-    if (request.url.startsWith(UrlService.mainUrl()) || request.url.startsWith(UrlService.mainUrl(withWww: true))) {
+    if (UrlService.matchDomain(request.url)) {
       return NavigationDecision.navigate;
     }
 
