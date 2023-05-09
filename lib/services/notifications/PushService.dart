@@ -6,7 +6,7 @@ class PushService {
   static String TOKEN_KEY = 'token';
   static String OLD_TOKEN_KEY = 'old_token';
   static String LAST_TIME_KEY = 'last_saved_time';
-  static int TOKEN_RESET_TIME = 86400; //24h
+  static int TOKEN_RESET_TIME = 3600; //1h
 
   final DeviceService _deviceService = DeviceService();
   final GetStorage _storage = GetStorage();

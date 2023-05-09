@@ -15,7 +15,7 @@ class FilePickerService {
   Future<List<String>> androidFilePicker(webview_flutter_android.FileSelectorParams params) async {
     if (params.acceptTypes.any((type) => type == 'image/*')) {
       final picker = image_picker.ImagePicker();
-      final photo = await picker.pickImage(source: image_picker.ImageSource.camera);
+      final photo = await picker.pickImage(source: image_picker.ImageSource.gallery);
 
       if (photo == null) {
         return [];
